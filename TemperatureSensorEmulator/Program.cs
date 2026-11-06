@@ -60,7 +60,22 @@ namespace TemperatureSensorEmulator
             DateTime now = DateTime.Now;
             string dataCreateFile = now.ToString("yyyyMMddHHmmss");
             fileExampleTxt = $"{numberPlot}-{numberFishСagе}-{dataCreateFile}.txt";
-            File.Create(Path.Combine(processingPath, fileExampleTxt));
+            
+            double generateTemperature()
+            {
+                double minTemperatureFishCage = 15.0;
+                double maxTemperatureFishCage = 26.0;
+                double result = minTemperatureFishCage + (Random.Shared.NextDouble() * (maxTemperatureFishCage - minTemperatureFishCage));
+                return result; // Нужно округлить значение
+            }
+
+            File.WriteAllText(Path.Combine(processingPath, fileExampleTxt),$"1|{generateTemperature()}\n2|{generateTemperature()}");
+
+            // В созданый файл нужно генерацию температуры прудов от 15 до 25, данные записать в строку. 1 строка: "1|35,5" т.е. внутрь пишется номер датчика|температура
+            
+
+
+            
 
             /// <summary>
             /// перечисляем в папке файлы указаной маской filePath, и читаем их
@@ -69,13 +84,15 @@ namespace TemperatureSensorEmulator
             {
                 Console.WriteLine(file);
             }
+
+            Console.WriteLine(Random.Shared.NextDouble());
         }
     }
 }
 
 //TODO: Сделать генератор температуры
-//TODO: Нужно чтобы генератор создавал папку Processing(Temp) если ее нет
+//DONE: Нужно чтобы генератор создавал папку Processing(Temp) если ее нет
 //TODO: Создать генерацию температуры прудов от 15 до 25, данные записать в строку. 1 строка: "1|35,5" т.е. внутрь пишется номер датчика|температура
-//TODO: В папке Proccesing создать файл, где имя в формате 1-4-20220128150030.txt где номерУчастка-НомерСадка-дата.txt 2022.01.28 15:00:30
+//DONE: В папке Proccesing создать файл, где имя в формате 1-4-20220128150030.txt где номерУчастка-НомерСадка-дата.txt 2022.01.28 15:00:30
 //TODO: После, того как файл создался, нужно перенести файл в папку Ready.
 
