@@ -11,25 +11,15 @@ namespace TemperatureSensorEmulator
         static void Main(string[] args)
         {
             string filePath = $"*.txt";
-            string fileExampleTxt = $"Example.txt";
+            string fileTxt = $"Example.txt";
             string processingPath = "Processing";
             string readyPath = "Ready"; // Конечная папка
 
-            int numberFishСagе = 4;
-            int numberPlot = 1;
+            int numberPlot = 1; // номер участка пруда, участок содержит пруды
+            int numberFishСagе = 3; // номер садка
 
-
-            /// <summary>
-            /// Если нет папки создает
-            /// </summary>
-            if (!Directory.Exists(processingPath))
-            {
-                Directory.CreateDirectory(processingPath);
-            }
-            else
-            {
-                Console.WriteLine($"Directrory {processingPath} exists.");
-            }
+            
+            
 
             /// <summary>
             /// перечисление папки processingPath
@@ -40,36 +30,23 @@ namespace TemperatureSensorEmulator
             }
 
 
-            string fullPath = Path.Combine(processingPath, filePath); // тут я хочу создать строку и потом с помощью File проверить существует ли *.txt
+            string fullPath = Path.Join(processingPath, filePath); // тут я хочу создать строку и потом с помощью File проверить существует ли *.txt
             Console.WriteLine(fullPath);
             //Directory.EnumerateFiles(fullPath, filePath);
             Console.WriteLine();
-            
 
-            if(!Directory.EnumerateFiles(processingPath, filePath).Any())
-            {
-                Console.WriteLine($"в папке {processingPath} нет файлов {filePath}");
-            }
-            else
-            {
-                Console.WriteLine($"в папке {processingPath} есть файлы {filePath}");
-            }
 
 
             // Файл должен создаваться с датой создания файла
             DateTime now = DateTime.Now;
             string dataCreateFile = now.ToString("yyyyMMddHHmmss");
-            fileExampleTxt = $"{numberPlot}-{numberFishСagе}-{dataCreateFile}.txt";
-            
-            double generateTemperature()
-            {
-                double minTemperatureFishCage = 15.0;
-                double maxTemperatureFishCage = 26.0;
-                double result = minTemperatureFishCage + (Random.Shared.NextDouble() * (maxTemperatureFishCage - minTemperatureFishCage));
-                return result; // Нужно округлить значение
-            }
+            fileTxt = $"{numberPlot}-{numberFishСagе}-{dataCreateFile}.txt";
+            TemperatureSensor temperatureSensor = new TemperatureSensor(); // стоит ли класс создавать TemperatureSensor каждый раз либо, создать один раз, и пользоваться одним методом?
+            SensorDataFileWriter sensorDataFileWriter = new SensorDataFileWriter(temperatureSensor, numberPlot, numberFishСagе);
 
-            File.WriteAllText(Path.Combine(processingPath, fileExampleTxt),$"1|{generateTemperature()}\n2|{generateTemperature()}");
+            sensorDataFileWriter.CreateFile();
+
+            //File.WriteAllText(Path.Combine(processingPath, fileTxt),$"1|{temperatureSensor.generateTemperature()}\n2|{temperatureSensor.generateTemperature()}");
 
             // В созданый файл нужно генерацию температуры прудов от 15 до 25, данные записать в строку. 1 строка: "1|35,5" т.е. внутрь пишется номер датчика|температура
             
@@ -85,14 +62,16 @@ namespace TemperatureSensorEmulator
                 Console.WriteLine(file);
             }
 
-            Console.WriteLine(Random.Shared.NextDouble());
+            Console.WriteLine(Math.Round(Random.Shared.NextDouble(), 1));
         }
     }
 }
 
 //TODO: Сделать генератор температуры
 //DONE: Нужно чтобы генератор создавал папку Processing(Temp) если ее нет
-//TODO: Создать генерацию температуры прудов от 15 до 25, данные записать в строку. 1 строка: "1|35,5" т.е. внутрь пишется номер датчика|температура
+//DONE: Создать генерацию температуры прудов от 15 до 25, данные записать в строку. 1 строка: "1|35,5" т.е. внутрь пишется номер датчика|температура
 //DONE: В папке Proccesing создать файл, где имя в формате 1-4-20220128150030.txt где номерУчастка-НомерСадка-дата.txt 2022.01.28 15:00:30
+//DONE: Сделать отдельный класс температурного сенсора
+//TODO: Нужен DI
 //TODO: После, того как файл создался, нужно перенести файл в папку Ready.
 
