@@ -6,13 +6,14 @@ namespace TemperatureSensorEmulator
 {
     internal class SensorDataFileWriter
     {
-        string _fileSearchPattern = $"*.txt";
         string _fileTxt = $"Example.txt";
         string _processingPath = "Processing";
+        string _readyPath = "Ready";
+        string _fullPath = "";
         int _numberPlot = 1; // номер участка пруда, участок содержит пруды
         int _numberFishCage = 4; // номер пруда 
         string _dataCreateFile = string.Empty;
-        TemperatureSensor? _temperatureSensor;
+        TemperatureSensor _temperatureSensor;
         public SensorDataFileWriter(TemperatureSensor temperatureSensor, int numberPlot, int numberFishCage)
         {
             _temperatureSensor = temperatureSensor ?? new TemperatureSensor();
@@ -20,37 +21,39 @@ namespace TemperatureSensorEmulator
             _numberFishCage = numberFishCage;
         }
         /// <summary>
-        /// Если нет папки создает
-        /// </summary
-        public void CheckFolder()
+        /// Если нет папки создает Processing, Ready
+        /// </summary>
+        private void EnsureDirectoriesExist()
         {
             if (!Directory.Exists(_processingPath))
             {
                 Directory.CreateDirectory(_processingPath);
             }
-            else
+            if (!Directory.Exists(_readyPath))
             {
-                Console.WriteLine($"Directrory {_processingPath} exists.");
+                Directory.CreateDirectory(_readyPath);
             }
+
         }
+        
 
         public void CreateFile()
         {
-            CheckFolder();
-            DateTime _now = DateTime.Now;
-            _dataCreateFile = _now.ToString("yyyyMMddHHmmss");
+            EnsureDirectoriesExist();
+            DateTime now = DateTime.Now;
+            _dataCreateFile = now.ToString("yyyyMMddHHmmss");
             _fileTxt = $"{_numberPlot}-{_numberFishCage}-{_dataCreateFile}.txt";
-            if (!Directory.EnumerateFiles(_processingPath, _fileSearchPattern).Any())
+            _fullPath = Path.Combine(_processingPath, _fileTxt);
+            File.WriteAllText(_fullPath, $"1|{_temperatureSensor.ReadTemperature()}\n2|{_temperatureSensor.ReadTemperature()}");
+            if (File.Exists(Path.Combine(_processingPath, _fileTxt)))
             {
-                Console.WriteLine($"в папке {_processingPath} нет файлов {_fileSearchPattern}");
+                Console.WriteLine($"ФАЙЛ {_fullPath} существует");
+                File.Move(_fullPath, Path.Combine(_readyPath, _fileTxt));
             }
-            else
-            {
-                Console.WriteLine($"в папке {_processingPath} есть файлы {_fileSearchPattern}");
-            }
-            File.WriteAllText(Path.Combine(_processingPath, _fileTxt), $"1|{_temperatureSensor?.generateTemperature()}\n2|{_temperatureSensor?.generateTemperature()}");
+           
+
         }
 
-        // остановился на просмотр кода с ии, который исправил парку ошибок
+        // нет проверок если файлы застряли в папке Proceccing. Нам это пока что и не нужно
     }
 }

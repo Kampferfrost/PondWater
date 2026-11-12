@@ -7,16 +7,25 @@ namespace TemperatureSensorEmulator
     internal class TemperatureSensor
     {
         public Guid Id { get; set; }
-        public double CurrentTemperature { get; set; }
-        public DateTime Timestamp  { get; set; }
-        private double _minTemperatureFishCage = 15.0;
-        private double _maxTemperatureFishCage = 26.0;
+        public double CurrentTemperature { get; private set; }
+        public DateTime Timestamp  { get; private set; }
+        private readonly double _minTemperature = 15.0;
+        private readonly double _maxTemperature = 26.0;
 
-        public double generateTemperature()
+        public TemperatureSensor(double minTemperature = 15.0, double maxTemperature = 26.0)
         {
-            double result = _minTemperatureFishCage + (Random.Shared.NextDouble() * (_maxTemperatureFishCage - _minTemperatureFishCage));
-            result = Math.Round(result, 1);
-            return result; 
+            Id = Guid.NewGuid();
+            _minTemperature = minTemperature;
+            _maxTemperature = maxTemperature;
+
+            ReadTemperature();
+        }
+
+        public double ReadTemperature()
+        {
+            double rawValue = _minTemperature + (Random.Shared.NextDouble() * (_maxTemperature - _minTemperature));
+            CurrentTemperature = Math.Round(rawValue, 1);
+            return CurrentTemperature; 
         }
 
         // нужно разобраться тут со свойствами, а то они не используются здесь
